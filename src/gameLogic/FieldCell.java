@@ -1,10 +1,13 @@
 package gameLogic;
 
 public class FieldCell {
-    protected boolean opened = false;
-    protected boolean mined = false;
-    protected boolean flagged = false;
-    protected int minesAround = 0;
+    private boolean opened = false;
+    private boolean mined = false;
+    private boolean flagged = false;
+    private int minesAround = 0;
+
+    public FieldCell() {
+    }
 
     public FieldCell(boolean mined) {
         this.mined = mined;
@@ -20,6 +23,10 @@ public class FieldCell {
 
     public boolean isMined() {
         return mined;
+    }
+
+    public void setMined(boolean mined) {
+        this.mined = mined;
     }
 
     public boolean isFlagged() {
