@@ -1,17 +1,20 @@
 package gameLogic;
 
+/**
+ *  Данный класс реализует ячейку минного поля
+ *  {@link #opened} - открытая ячейка
+ *  {@link #mined} - заминированная ячейка
+ *  {@link #flagged} - ячейка, помеченная флагом
+ *  {@link #minesAround} - число, которое показывает, сколько мин находится вокруг этой ячейки
+ */
 public class FieldCell {
     private boolean opened = false;
     private boolean mined = false;
     private boolean flagged = false;
     private int minesAround = 0;
 
-    public FieldCell() {
-    }
 
-    public FieldCell(boolean mined) {
-        this.mined = mined;
-    }
+    public FieldCell() {}
 
     public boolean isOpened() {
         return opened;

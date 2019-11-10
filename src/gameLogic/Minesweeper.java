@@ -3,15 +3,31 @@ package gameLogic;
 import java.util.ArrayList;
 import java.util.Random;
 
+/**
+ * Данный класс реализует функциональность игрового минного поля
+ * {@link #field} - массив, хранящий ячейки поля
+ * @see FieldCell - ячейка поля
+ * {@link #fieldSizeX} - размер поля по оси X
+ * {@link #fieldSizeY} - размер поля по оси Y
+ * {@link #minesCount} - количество мин на поле
+ * {@link #flagsCount} - количество установленных флагов
+ * {@link #gameOver} - статус окончания игры
+ */
 public class Minesweeper {
     protected FieldCell [][]field;
     protected int fieldSizeX = 9;
     protected int fieldSizeY = 9;
-    private int minesCount;
-    private int flagsCount = 0;
-    private boolean firstClick = true;
-    private boolean gameOver = false;
+    protected int minesCount;
+    protected int flagsCount = 0;
+    protected boolean firstClick = true;
+    protected boolean gameOver = false;
 
+    /**
+     *
+     * @param fieldSizeX - размер поля по оси X
+     * @param fieldSizeY - размер поля по оси Y
+     * @param minesCount - количество мин, которое необходимо сгенерировать на случайных ячейках поля
+     */
     public Minesweeper(int fieldSizeX, int fieldSizeY, int minesCount) {
         this.fieldSizeX = fieldSizeX;
         this.fieldSizeY = fieldSizeY;
@@ -28,6 +44,11 @@ public class Minesweeper {
         }
     }
 
+    /**
+     * Клик по ячейке поля
+     * @param posX - позиция ячейки по оси X
+     * @param posY - позиция ячейки по оси Y
+     */
     public void clickOnCell(int posX, int posY){
         if ((posX<0 || posX>=fieldSizeX) || (posY<0 || posY>=fieldSizeY)) return;
         if (gameOver || field[posX][posY].isFlagged()|| field[posX][posY].isOpened()) return;
@@ -46,6 +67,11 @@ public class Minesweeper {
         checkGameOver();
     }
 
+    /**
+     * Установка или снятие флага на ячейку поля
+     * @param posX - позиция ячейки по оси X
+     * @param posY - позиция ячейки по оси Y
+     */
     public void setFlag(int posX, int posY){
         if ((posX<0 || posX>=fieldSizeX) || (posY<0 || posY>=fieldSizeY)) return;
         if (gameOver || field[posX][posY].isOpened()) return;
@@ -56,6 +82,7 @@ public class Minesweeper {
             field[posX][posY].setFlagged(true);
             flagsCount++;
         }
+        checkGameOver();
     }
 
     public FieldCell[][] getField() {
@@ -82,6 +109,11 @@ public class Minesweeper {
         return gameOver;
     }
 
+    /**
+     * Генерация мин на поле в случайных местах (генерация происходит после первой открытой ячейки, в ней никогда не бывает мины)
+     * @param startPosX - позиция первой открытой ячейки по оси X
+     * @param startPosY - позиция первой открытой ячейки по оси Y
+     */
     protected void generateMinedField(int startPosX, int startPosY){
         ArrayList<Integer> minePosition = new ArrayList<>();
         for (int i = 0; i < fieldSizeX * fieldSizeY; i++) {
@@ -99,6 +131,9 @@ public class Minesweeper {
         }
     }
 
+    /**
+     * Расчет числа, которое показывает, сколбько бомб окружает текущую ячейку (расчет для всех ячеек поля)
+     */
     protected void makeCountMinesAround(){
         for (int i = 0; i < fieldSizeX; i++) { //два цикла по всем ячейкам поля
             for (int j = 0; j < fieldSizeY; j++) {
@@ -117,6 +152,9 @@ public class Minesweeper {
     }
 
 
+    /**
+     * Проверка окончания игры (подрыв на мине, или отмечены все мины)
+     */
     protected void checkGameOver(){
         if (flagsCount == minesCount){
             for (int i = 0; i < fieldSizeX; i++) {
@@ -129,17 +167,23 @@ public class Minesweeper {
         gameOver = true;
     }
 
+    /**
+     * Открытие ячеек вокруг текущей
+     * @param posX - Позицця по оси X ячейки, по которой был произведен клик
+     * @param posY - Позицця по оси Y ячейки, по которой был произведен клик
+     */
     protected void openCellsAround(int posX, int posY){
         ArrayList<Pair> needOpen = new ArrayList<>();
-        for (int i = 0; i < fieldSizeX; i++) {
-            for (int j = 0; j < fieldSizeY; j++) {
-                for (int k = i-1; k <= i+1; k++) {
-                    for (int l = j-1; l <= j+1; l++){
-                        if ((k<0 || k>=fieldSizeX) || (l<0 || l>=fieldSizeY)) continue;
-                        if (i==k && j==l) continue;
-                        if (!field[k][l].isOpened()){
-                            field[k][l].openCell();
-                            needOpen.add(new Pair(k,l));
+        field[posX][posY].openCell();
+        for (int i = posX-1; i <= posX+1; i++) {
+            for (int j = posY-1; j <= posY+1; j++) {
+                if ((i<0 || i>=fieldSizeX) || (j<0 || j>=fieldSizeY)) continue;
+                if (!field[i][j].isOpened()){
+                    if (!field[i][j].isMined()){
+                        if (field[i][j].getMinesAround()==0){
+                            needOpen.add(new Pair(i,j));
+                        }else {
+                            field[i][j].openCell();
                         }
                     }
                 }
@@ -150,7 +194,7 @@ public class Minesweeper {
         }
     }
 
-    private class Pair{
+    protected class Pair{
         int first;
         int second;
 
