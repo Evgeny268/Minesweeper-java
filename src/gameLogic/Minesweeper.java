@@ -179,7 +179,7 @@ public class Minesweeper {
             for (int j = posY-1; j <= posY+1; j++) {
                 if ((i<0 || i>=fieldSizeX) || (j<0 || j>=fieldSizeY)) continue;
                 if (!field[i][j].isOpened()){
-                    if (!field[i][j].isMined()){
+                    if (!field[i][j].isMined() && !field[i][j].isFlagged()){
                         if (field[i][j].getMinesAround()==0){
                             needOpen.add(new Pair(i,j));
                         }else {
